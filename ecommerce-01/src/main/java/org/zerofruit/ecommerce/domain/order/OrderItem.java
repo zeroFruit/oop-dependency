@@ -1,7 +1,8 @@
 package org.zerofruit.ecommerce.domain.order;
 
 import lombok.*;
-import org.zerofruit.ecommerce.domain.store.OptionGroup;
+import org.zerofruit.ecommerce.domain.generic.money.Money;
+import org.zerofruit.ecommerce.domain.store.OptionGroupSpecification;
 import org.zerofruit.ecommerce.domain.store.Product;
 
 import javax.persistence.*;
@@ -38,15 +39,10 @@ public class OrderItem {
     private List<OrderOptionGroup> groups = new ArrayList<>();
 
     public void validate() {
-        product.validateOrder(name, convertToOptionGroups());
+        product.validateOrder(name, groups);
     }
 
-    private List<OptionGroup> convertToOptionGroups() {
-        return groups
-                .stream()
-                .map(OrderOptionGroup::convertToOptionGroup)
-                .collect(toList());
+    public Money calculatePrice() {
+        return Money.sum(groups, OrderOptionGroup::calculatePrice).times(count);
     }
-
-
 }

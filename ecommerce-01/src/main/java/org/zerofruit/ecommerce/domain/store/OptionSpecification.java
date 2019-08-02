@@ -2,6 +2,8 @@ package org.zerofruit.ecommerce.domain.store;
 
 import lombok.*;
 import org.zerofruit.ecommerce.domain.generic.money.Money;
+import org.zerofruit.ecommerce.domain.order.OrderOption;
+import org.zerofruit.ecommerce.domain.order.OrderOptionGroup;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -12,6 +14,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 @EqualsAndHashCode
 public class OptionSpecification {
     @Id
@@ -20,12 +23,14 @@ public class OptionSpecification {
     private Long id;
 
     @Column(name="NAME")
+    @NonNull
     private String name;
 
     @Column(name="PRICE")
+    @NonNull
     private Money price;
 
-    public boolean isSatisfiedBy(Option option) {
+    public boolean isSatisfiedBy(OrderOption option) {
         return Objects.equals(name, option.getName()) && Objects.equals(price, option.getPrice());
     }
 }

@@ -2,7 +2,7 @@ package org.zerofruit.ecommerce.domain.order;
 
 import lombok.*;
 import org.zerofruit.ecommerce.domain.generic.money.Money;
-import org.zerofruit.ecommerce.domain.store.Option;
+import org.zerofruit.ecommerce.domain.store.OptionSpecification;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -19,8 +19,4 @@ public class OrderOption {
 
     @Column(name = "PRICE")
     private Money price;
-
-    public Option convertToOption() {
-        return new Option(name, price);
-    }
 }

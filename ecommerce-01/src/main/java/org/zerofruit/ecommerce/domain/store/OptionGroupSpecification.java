@@ -1,6 +1,8 @@
 package org.zerofruit.ecommerce.domain.store;
 
 import lombok.*;
+import org.zerofruit.ecommerce.domain.order.OrderOption;
+import org.zerofruit.ecommerce.domain.order.OrderOptionGroup;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -34,31 +36,36 @@ public class OptionGroupSpecification {
     @JoinColumn(name="OPTION_GROUP_SPEC_ID")
     private List<OptionSpecification> optionSpecs = new ArrayList<>();
 
-    public static OptionGroupSpecification basic(String name, boolean exclusive, OptionSpecification... options) {
+    public OptionGroupSpecification(String name, List<OptionSpecification> optionSpecs) {
+        this.name = name;
+        this.optionSpecs = optionSpecs;
+    }
+
+    public static OptionGroupSpecification basic(String name, boolean exclusive, OptionSpecification... optionSpecs) {
         return OptionGroupSpecification
                 .builder()
                 .name(name)
                 .exclusive(exclusive)
                 .basic(true)
-                .optionSpecs(Arrays.asList(options))
+                .optionSpecs(Arrays.asList(optionSpecs))
                 .build();
     }
 
-    public static OptionGroupSpecification additive(String name, boolean exclusive, OptionSpecification... options) {
+    public static OptionGroupSpecification additive(String name, boolean exclusive, OptionSpecification... optionSpecs) {
         return OptionGroupSpecification
                 .builder()
                 .name(name)
                 .exclusive(exclusive)
                 .basic(false)
-                .optionSpecs(Arrays.asList(options))
+                .optionSpecs(Arrays.asList(optionSpecs))
                 .build();
     }
 
-    public boolean isSatisfiedBy(OptionGroup optionGroup) {
-        return !isSatisfied(optionGroup.getName(), satisfied(optionGroup.getOptions()));
+    public boolean isSatisfiedBy(OrderOptionGroup group) {
+        return !isSatisfied(group.getName(), satisfied(group.getOrderOptions()));
     }
 
-    private boolean isSatisfied(String groupName, List<Option> satisfied) {
+    private boolean isSatisfied(String groupName, List<OrderOption> satisfied) {
         if (!name.equals(groupName)) {
             return false;
         }
@@ -74,8 +81,8 @@ public class OptionGroupSpecification {
         return true;
     }
 
-    private List<Option> satisfied(List<Option> options) {
-        return optionSpecs
+    private List<OrderOption> satisfied(List<OrderOption> options) {
+        return this.optionSpecs
                 .stream()
                 .flatMap(spec -> options.stream().filter(spec::isSatisfiedBy))
                 .collect(toList());
