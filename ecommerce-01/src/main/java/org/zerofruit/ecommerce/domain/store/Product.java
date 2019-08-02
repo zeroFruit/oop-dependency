@@ -2,6 +2,8 @@ package org.zerofruit.ecommerce.domain.store;
 
 import lombok.*;
 import org.zerofruit.ecommerce.domain.generic.money.Money;
+import org.zerofruit.ecommerce.domain.order.OrderOption;
+import org.zerofruit.ecommerce.domain.order.OrderOptionGroup;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ public class Product {
     private Store store;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name="MENU_ID")
+    @JoinColumn(name="PRODUCT_ID")
     private List<OptionGroupSpecification> optionGroupSpecs = new ArrayList<>();
 
     public Money getBasePrice() {
@@ -46,7 +48,7 @@ public class Product {
                 .orElseThrow(IllegalStateException::new);
     }
 
-    public void validateOrder(String orderName, List<OptionGroup> optionGroups){
+    public void validateOrder(String orderName, List<OrderOptionGroup> optionGroups){
         if (!this.name.equals(orderName)) {
             throw new IllegalArgumentException("product name is changed");
         }
@@ -56,11 +58,11 @@ public class Product {
         }
     }
 
-    private boolean isSatisfiedBy(List<OptionGroup> cartOptionGroups) {
+    private boolean isSatisfiedBy(List<OrderOptionGroup> cartOptionGroups) {
         return cartOptionGroups.stream().anyMatch(this::isSatisfiedBy);
     }
 
-    private boolean isSatisfiedBy(OptionGroup group) {
+    private boolean isSatisfiedBy(OrderOptionGroup group) {
         return optionGroupSpecs
                 .stream()
                 .anyMatch(spec -> spec.isSatisfiedBy(group));

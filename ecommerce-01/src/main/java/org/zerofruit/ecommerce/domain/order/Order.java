@@ -1,6 +1,7 @@
 package org.zerofruit.ecommerce.domain.order;
 
 import lombok.*;
+import org.zerofruit.ecommerce.domain.generic.money.Money;
 import org.zerofruit.ecommerce.domain.store.Store;
 
 import javax.persistence.*;
@@ -47,7 +48,21 @@ public class Order {
     }
 
     private void validate() {
+        if (orderItems.isEmpty()) {
+            throw new IllegalStateException("Order items are empty");
+        }
 
+        if (!store.isOpen()) {
+            throw new IllegalArgumentException("Store is not open");
+        }
+
+        if (!store.isValidOrderAmount(calculateTotalPrice())) {
+            throw new IllegalArgumentException("Order price is not over minimum order amount");
+        }
+
+        for (OrderItem orderItem : orderItems) {
+            orderItem.validate();
+        }
     }
 
     private void ordered() {
@@ -60,7 +75,11 @@ public class Order {
 
     public void delivered() {
         this.orderStatus = OrderStatus.DELIVERED;
-        // TODO: shop bill commission fee
+        this.store.billCommissionFee(calculateTotalPrice());
+    }
+
+    private Money calculateTotalPrice() {
+        return Money.sum(orderItems, OrderItem::calculatePrice);
     }
 
 }
