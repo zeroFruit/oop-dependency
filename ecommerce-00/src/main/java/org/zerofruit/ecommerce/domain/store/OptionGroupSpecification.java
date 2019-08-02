@@ -1,6 +1,8 @@
 package org.zerofruit.ecommerce.domain.store;
 
 import lombok.*;
+import org.zerofruit.ecommerce.domain.order.OrderOption;
+import org.zerofruit.ecommerce.domain.order.OrderOptionGroup;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -59,11 +61,11 @@ public class OptionGroupSpecification {
                 .build();
     }
 
-    public boolean isSatisfiedBy(OptionGroup group) {
-        return !isSatisfied(group.getName(), satisfied(group.getOptions()));
+    public boolean isSatisfiedBy(OrderOptionGroup group) {
+        return !isSatisfied(group.getName(), satisfied(group.getOrderOptions()));
     }
 
-    private boolean isSatisfied(String groupName, List<Option> satisfied) {
+    private boolean isSatisfied(String groupName, List<OrderOption> satisfied) {
         if (!name.equals(groupName)) {
             return false;
         }
@@ -79,7 +81,7 @@ public class OptionGroupSpecification {
         return true;
     }
 
-    private List<Option> satisfied(List<Option> options) {
+    private List<OrderOption> satisfied(List<OrderOption> options) {
         return this.optionSpecs
                 .stream()
                 .flatMap(spec -> options.stream().filter(spec::isSatisfiedBy))

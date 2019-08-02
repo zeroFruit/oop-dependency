@@ -2,7 +2,6 @@ package org.zerofruit.ecommerce.domain.order;
 
 import lombok.*;
 import org.zerofruit.ecommerce.domain.generic.money.Money;
-import org.zerofruit.ecommerce.domain.store.OptionGroup;
 import org.zerofruit.ecommerce.domain.store.OptionGroupSpecification;
 
 import javax.persistence.*;
@@ -35,18 +34,5 @@ public class OrderOptionGroup {
 
     public Money calculatePrice() {
         return Money.sum(orderOptions, OrderOption::getPrice);
-    }
-
-    public OptionGroup convertToOptionGroup() {
-        return OptionGroup
-                .builder()
-                .name(name)
-                .options(
-                        orderOptions
-                                .stream()
-                                .map(OrderOption::convertToOption)
-                                .collect(toList())
-                )
-                .build();
     }
 }
